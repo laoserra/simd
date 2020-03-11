@@ -68,6 +68,8 @@ def update_figure(deprv_label, domain_rank):
 
     df_domain = df_domain.round({'local_share': 1, 'national_share': 1})
     df_domain.sort_values(by='local_share', ascending=False, inplace=True)
+    print(df_domain)
+    #df_domain.to_csv('deprv5_by_total.csv', index_label='Council')
 
 #-------------------------------------------------------------------------------
 #######
