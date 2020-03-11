@@ -4,6 +4,9 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import json
+with open('./GIS_data/Scotland_Councils10_wgs84.geojson') as myfile:
+    councils =  json.load(myfile)
 
 df = pd.read_csv('./Derived_Data/SIMD_2020_Ranks_and_Domain_Ranks.csv')
 
@@ -28,19 +31,32 @@ deprv_options = [{'label': i, 'value': i} for i in deprv_features]
 domain_options = [{'label': i.replace('_', ' '), 'value': i}
                   for i in df.columns[2:]]
 
+# share options for dropdown boxes
+share_options = [{'label': 'local share', 'value': 'local_share'},
+                 {'label': 'national share', 'value': 'national_share'}]
 
 # Dash layout with several components: Div,Graph and Dropdown
 app.layout = html.Div([
-    dcc.Graph(id='bar_share'),
+    html.Div(
+        id='my-div',
+        children=[
+            dcc.Graph(id='bar_share', figure=dict(data=[], layout={})),
+            dcc.Graph(id='map', figure=dict(data=[], layout={}))
+        ]
+    ),
     dcc.Dropdown(id='deprv_label', options=deprv_options, value='5% most deprived'),
-    dcc.Dropdown(id='domain_rank', options=domain_options, value='SIMD2020_Rank')
+    dcc.Dropdown(id='domain_rank', options=domain_options, value='SIMD2020_Rank'),
+    dcc.Dropdown(id='share_label', options=share_options, value='local_share')
 ])
 
-# Create a Dash callback with two inputs
-@app.callback(Output('bar_share', 'figure'),
+# Create a Dash callback with three inputs and two outputs
+
+@app.callback([Output('bar_share', 'figure'),
+               Output('map', 'figure')],
               [Input('deprv_label', 'value'),
-               Input('domain_rank', 'value')])
-def update_figure(deprv_label, domain_rank):
+               Input('domain_rank', 'value'),
+               Input('share_label', 'value')])
+def update_figures(deprv_label, domain_rank, share_label):
 
     # filters a subdataframe based on the chosen deprivation label
     # rounded values. The official values are floored
@@ -61,48 +77,59 @@ def update_figure(deprv_label, domain_rank):
                           axis=1)
     df_domain.fillna(0, inplace=True)
     df_domain = df_domain.astype('int64')
-    df_domain['local_share'] = df_domain[deprv_label]* 100 / \
-                               df_domain['Total_datazones']
-    df_domain['national_share'] = df_domain[deprv_label] * 100 / \
+
+    if share_label == 'local_share':
+        df_domain[share_label] = df_domain[deprv_label]* 100 / \
+                                 df_domain['Total_datazones']
+    else:
+        df_domain[share_label] = df_domain[deprv_label] * 100 / \
                                   df_domain[deprv_label].sum()
 
-    df_domain = df_domain.round({'local_share': 1, 'national_share': 1})
-    df_domain.sort_values(by='local_share', ascending=False, inplace=True)
-    print(df_domain)
-    #df_domain.to_csv('deprv5_by_total.csv', index_label='Council')
-
+    df_domain = df_domain.round({share_label: 1})
+    df_domain.sort_values(by=share_label, ascending=False, inplace=True)
 #-------------------------------------------------------------------------------
 #######
 # This is a grouped bar chart showing two traces
 # (national and local shares) for each Council
 ######
-    trace1 = go.Bar(
+    data = [go.Bar(
         x = df_domain.index,
-        y = df_domain.national_share,
-        name = 'National share',
+        y = df_domain[share_label],
+        name = share_label.replace('_', ' '),
         marker_color='rgb(26, 118, 255)'
-    )
+    )]
 
-    trace2 = go.Bar(
-        x = df_domain.index,
-        y = df_domain.local_share,
-        name = 'Local share',
-        marker_color='rgb(55, 83, 109)'
-    )
-
-    data = [trace1, trace2]
     layout = go.Layout(
-        title = dict(text='SIMD 2020 - local and national share by Council \
-                     <br><sub><b>Deprivation level:</b> 5% most deprived; \
-                     <b>Domain rank:</b> Health</sub>'),
-        barmode = 'group',
+        title = dict(text='SIMD 2020 - local and national share by Council\
+                     <br><sub><b>Deprivation level:</b> {}\
+                     <b>Domain rank:</b> {}\
+                     <b>Share:</b> {}</sub></br>'\
+                     .format(deprv_label, domain_rank, share_label)
+                     ),
         yaxis=dict(ticksuffix="%")
     )
 
-    return {
-        'data': data,
-        'layout': layout
-    }
+    data1 = [
+        go.Choroplethmapbox(
+            geojson=councils,
+            locations=df_domain.index,
+            z=df_domain[share_label],
+            featureidkey="properties.Name",
+            marker_opacity=0.6,
+            colorscale='Blues'
+            )
+        ]
+
+    layout1 = go.Layout(
+        #title='blabla',
+        #xaxis='blabla',
+        mapbox_style='carto-positron',#"open-street-map",
+        mapbox_zoom=6,
+        mapbox_center = {"lat": 57.834, "lon": -3.406},
+        margin={"r":0,"t":0,"l":0,"b":0} # sets the margins in px. default:80
+        )
+    return [{'data': data, 'layout': layout},
+            {'data': data1, 'layout': layout1}]
 
 #-------------------------------------------------------------------------------
 # server clause
