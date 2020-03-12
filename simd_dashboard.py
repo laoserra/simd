@@ -5,6 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import json
+
 with open('./GIS_data/Scotland_Councils10_wgs84.geojson') as myfile:
     councils =  json.load(myfile)
 
@@ -100,6 +101,7 @@ def update_figures(deprv_label, domain_rank, share_label):
     )]
 
     layout = go.Layout(
+        template = "plotly_dark", #with this template the title aligns to left..
         title = dict(text='SIMD 2020 - local and national share by Council\
                      <br><sub><b>Deprivation level:</b> {}\
                      <b>Domain rank:</b> {}\
