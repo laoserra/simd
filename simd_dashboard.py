@@ -118,14 +118,14 @@ def update_figures(deprv_label, domain_rank, share_label):
             z=df_domain[share_label],
             featureidkey="properties.Name",
             marker_opacity=0.6,
-            colorscale='Blues'
+            colorscale='Viridis'#'Blues'
             )
         ]
 
     layout1 = go.Layout(
         #title='blabla',
         #xaxis='blabla',
-        mapbox_style='carto-positron',#"open-street-map",
+        mapbox_style='carto-darkmatter',#'stamen-toner',#'carto-positron',
         mapbox_zoom=6,
         mapbox_center = {"lat": 57.834, "lon": -3.406},
         margin={"r":0,"t":0,"l":0,"b":0} # sets the margins in px. default:80
