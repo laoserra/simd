@@ -5,6 +5,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import json
+import base64
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 with open('./GIS_data/Scotland_Councils10_wgs84.geojson') as myfile:
     councils =  json.load(myfile)
@@ -12,7 +15,12 @@ with open('./GIS_data/Scotland_Councils10_wgs84.geojson') as myfile:
 df = pd.read_csv('./Derived_Data/SIMD_2020_Ranks_and_Domain_Ranks.csv')
 
 # Launch the application
-app=dash.Dash()
+app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
 
 #returns a series with the total counts of datazones per council
 datazones_per_council = df.Council_area.value_counts()
@@ -36,20 +44,63 @@ domain_options = [{'label': i.replace('_', ' '), 'value': i}
 share_options = [{'label': 'local share', 'value': 'local_share'},
                  {'label': 'national share', 'value': 'national_share'}]
 
-# Dash layout with several components: Div,Graph and Dropdown
-app.layout = html.Div([
-    html.Div(
-        id='my-div',
-        children=[
-            dcc.Graph(id='bar_share', figure=dict(data=[], layout={})),
-            dcc.Graph(id='map', figure=dict(data=[], layout={}))
-        ]
-    ),
-    dcc.Dropdown(id='deprv_label', options=deprv_options, value='5% most deprived'),
-    dcc.Dropdown(id='domain_rank', options=domain_options, value='SIMD2020_Rank'),
-    dcc.Dropdown(id='share_label', options=share_options, value='local_share')
-])
+image_filename = './9722_UBDC_logo.png'
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
+# Dash layout with several components: Div,Graph and Dropdown
+app.layout =html.Div([
+    html.Div([
+        html.H2(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL')),
+        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))
+
+
+    ], style=dict(color='white', backgroundColor=colors['background'])),
+    html.Div([
+        html.Div(
+            style=dict(
+                width='49%',
+                backgroundColor='red',
+                position='relative'),
+            children=[
+                html.Div(
+                    style={
+                        'width': '330px',
+                        'position': 'absolute',
+                        'top': '0px'},
+                    children=[
+                        dcc.Dropdown(
+                            id='deprv_label',
+                            options=deprv_options,
+                            value='5% most deprived'),
+                        dcc.Dropdown(
+                            id='domain_rank',
+                            options=domain_options,
+                            value='SIMD2020_Rank'),
+                        dcc.Dropdown(
+                            id='share_label',
+                            options=share_options,
+                            value='local_share')]),
+                html.Hr(),
+                html.Div(
+                    id='my-div', #don't need this id
+                    style=dict(position='absolute',
+                               bottom='0px',
+                               left='0px',
+                               right='0px'), #another way to do a dictionary
+                    children=[ #by default 'children' is always present in each html component
+                        dcc.Graph(
+                            id='bar_share',
+                            figure=dict(data=[], layout={}))]
+                )
+            ]
+        ),
+        html.Div([
+            html.Div([
+                dcc.Graph(id='map', figure=dict(data=[], layout={}), style=dict(height='inherit'))
+                ], style=dict(height='100vh'))
+            ], style=dict(width='49%', float='right')) # outra forma de colocar a sintaxe
+    ], style={'backgroundColor': colors['background'], 'display': 'flex', 'height': '100vh'})
+])
 # Create a Dash callback with three inputs and two outputs
 
 @app.callback([Output('bar_share', 'figure'),
@@ -127,8 +178,9 @@ def update_figures(deprv_label, domain_rank, share_label):
         #xaxis='blabla',
         mapbox_style='carto-darkmatter',#'stamen-toner',#'carto-positron',
         mapbox_zoom=6,
-        mapbox_center = {"lat": 57.834, "lon": -3.406},
-        margin={"r":0,"t":0,"l":0,"b":0} # sets the margins in px. default:80
+        mapbox_center = {"lat": 57.834, "lon": -3.9},
+        margin={"r":0,"t":0,"l":0,"b":0}, # sets the margins in px. default:80
+        paper_bgcolor=colors['background']
         )
     return [{'data': data, 'layout': layout},
             {'data': data1, 'layout': layout1}]

@@ -1,0 +1,39 @@
+/* each rule starts with { and ends with } */
+/* Each CSS rule starts with a selector, h1,p,li, or a list of selectors in order to tell the browser which element or elements the rules should apply to
+*/
+
+h1 {
+  color: green
+
+}
+
+p {
+  color: blue
+    
+}
+
+li {
+  list-style-type: square;
+}
+
+.special {
+  color: orange;
+  font-weight: bold;
+}
+
+li em {
+  color: rebeccapurple;
+}
+
+h1 + p {
+    font-size: 200%;
+}
+    
+a:link {
+  color: pink;
+}
+
+a:visited {
+  color: green;
+}
+
