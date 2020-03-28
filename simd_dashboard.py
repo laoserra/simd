@@ -50,11 +50,15 @@ encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 # Dash layout with several components: Div,Graph and Dropdown
 app.layout =html.Div([
     html.Div([
-        html.H2(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL')),
-        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))
+        html.Div([
+            html.H5(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL'))
+        ]),
+        html.Div([
+            html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))
+        ], style=dict(maxHeight='100%', maxWidth='100%')),
 
 
-    ], style=dict(color='white', backgroundColor=colors['background'])),
+    ], style=dict(color='white', backgroundColor=colors['background'], height='10vh')),
     html.Div([
         html.Div(
             style=dict(
@@ -97,9 +101,9 @@ app.layout =html.Div([
         html.Div([
             html.Div([
                 dcc.Graph(id='map', figure=dict(data=[], layout={}), style=dict(height='inherit'))
-                ], style=dict(height='100vh'))
-            ], style=dict(width='49%', float='right')) # outra forma de colocar a sintaxe
-    ], style={'backgroundColor': colors['background'], 'display': 'flex', 'height': '100vh'})
+            ], style=dict(height='89vh'))
+        ], style=dict(width='49%', float='right')) # outra forma de colocar a sintaxe
+    ], style={'backgroundColor': 'yellow', 'display': 'flex'})
 ])
 # Create a Dash callback with three inputs and two outputs
 
