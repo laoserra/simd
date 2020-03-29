@@ -51,26 +51,30 @@ encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 app.layout =html.Div([
     html.Div([
         html.Div([
-            html.H5(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL'))
-        ]),
+            html.H4(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL'),
+                    style=dict(lineHeight='7vh', textAlign='center',
+                               verticalAlign='middle'))
+        ], style=dict(backgroundColor=colors['background'], width='50%')),
         html.Div([
-            html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))
-        ], style=dict(maxHeight='100%', maxWidth='100%')),
-
-
-    ], style=dict(color='white', backgroundColor=colors['background'], height='10vh')),
+            html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()),
+                     style={'width':'100%', 'height':'100%',
+                            'object-fit': 'contain'})
+        ], style=dict(backgroundColor=colors['background'], width='50%',
+                      height='80%', margin='10px 10px')),
+    ], style=dict(color='white', display='flex',
+                  backgroundColor=colors['background'], height='10vh')),
     html.Div([
         html.Div(
             style=dict(
-                width='49%',
-                backgroundColor='red',
+                width='50%',
+                backgroundColor=colors['background'],
                 position='relative'),
             children=[
                 html.Div(
                     style={
                         'width': '330px',
                         'position': 'absolute',
-                        'top': '0px'},
+                        'top': '5vh', 'left': '5vh'},
                     children=[
                         dcc.Dropdown(
                             id='deprv_label',
@@ -84,7 +88,6 @@ app.layout =html.Div([
                             id='share_label',
                             options=share_options,
                             value='local_share')]),
-                html.Hr(),
                 html.Div(
                     id='my-div', #don't need this id
                     style=dict(position='absolute',
@@ -102,7 +105,7 @@ app.layout =html.Div([
             html.Div([
                 dcc.Graph(id='map', figure=dict(data=[], layout={}), style=dict(height='inherit'))
             ], style=dict(height='89vh'))
-        ], style=dict(width='49%', float='right')) # outra forma de colocar a sintaxe
+        ], style=dict(width='50%', float='right')) # outra forma de colocar a sintaxe
     ], style={'backgroundColor': 'yellow', 'display': 'flex'})
 ])
 # Create a Dash callback with three inputs and two outputs
