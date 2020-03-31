@@ -23,10 +23,12 @@ df = pd.read_csv('./Derived_Data/SIMD_2020_Ranks_and_Domain_Ranks.csv')
 app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
 #auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 
+'''
 colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
+'''
 
 #returns a series with the total counts of datazones per council
 datazones_per_council = df.Council_area.value_counts()
@@ -59,42 +61,47 @@ app.layout =html.Div([
         html.Div([
             html.H4(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL'),
                     style=dict(lineHeight='7vh', textAlign='center',
-                               verticalAlign='middle'))
-        ], style=dict(backgroundColor=colors['background'], width='50%')),
+                               verticalAlign='middle', color='#a5b1cd'))
+        ], style=dict(backgroundColor='#2f3445', width='50%')),
         html.Div([
             html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()),
                      style={'width':'100%', 'height':'100%',
                             'object-fit': 'contain'})
-        ], style=dict(backgroundColor=colors['background'], width='50%',
+        ], style=dict(backgroundColor='#2f3445',  width='50%',
                       height='80%', margin='10px 10px')),
     ], style=dict(color='white', display='flex',
-                  backgroundColor=colors['background'],
-                  borderBottom='thin lightgrey solid',
+                  backgroundColor='#2f3445',
+                  #borderBottom='thin lightgrey solid',
                   height='10vh')),
     html.Div([ # graphics div
         html.Div( # left graphics div
             style=dict(
                 width='50%',
-                backgroundColor=colors['background'],
+                backgroundColor='#282b38',
                 position='relative'),
             children=[
                 html.Div(
                     style={
-                        'width': '330px',
+                        'width': '345px',
                         'position': 'absolute',
                         'top': '10vh', 'left': '20%',
-                        'color': 'red',
-                        'background-color': 'blue'
+                        'color': '#a5b1bf',
+                        'background-color': '#282b38'
                         },
                     children=[
+                        html.P('Select deprivation level:'),
                         dcc.Dropdown(
                             id='deprv_label',
                             options=deprv_options,
                             value='5% most deprived'),
+                        html.Br(),
+                        html.P('Select domain rank:'),
                         dcc.Dropdown(
                             id='domain_rank',
                             options=domain_options,
                             value='SIMD2020_Rank'),
+                        html.Br(),
+                        html.P('Select share:'),
                         dcc.Dropdown(
                             id='share_label',
                             options=share_options,
@@ -102,7 +109,7 @@ app.layout =html.Div([
                 html.Div(
                     id='my-div', #don't need this id
                     style=dict(position='absolute',
-                               bottom='0px',
+                               bottom='10px',
                                left='0px',
                                right='0px'), #another way to do a dictionary
                     children=[ #by default 'children' is always present in each html component
@@ -117,7 +124,7 @@ app.layout =html.Div([
                 dcc.Graph(id='map', figure=dict(data=[], layout={}), style=dict(height='inherit'))
             ], style=dict(height='89vh'))
         ], style=dict(width='50%', float='right')) # outra forma de colocar a sintaxe
-    ], style={'backgroundColor': 'black', 'display': 'flex'})
+    ], style={'backgroundColor': '#282b38', 'display': 'flex'})
 ])
 # Create a Dash callback with three inputs and two outputs
 
@@ -165,19 +172,22 @@ def update_figures(deprv_label, domain_rank, share_label):
     data = [go.Bar(
         x = df_domain.index,
         y = df_domain[share_label],
-        name = share_label.replace('_', ' '),
-        marker_color='rgb(26, 118, 255)'
+        name = share_label.replace('_', ' ')
+        #marker_color='rgb(26, 118, 255)'
     )]
 
     layout = go.Layout(
-        template = "plotly_dark", #with this template the title aligns to left..
+        #template = "plotly_dark", #with this template the title aligns to left..
         title = dict(text='SIMD 2020 - local and national share by Council\
                      <br><sub><b>Deprivation level:</b> {}\
                      <b>Domain rank:</b> {}\
                      <b>Share:</b> {}</sub></br>'\
                      .format(deprv_label, domain_rank, share_label)
                      ),
-        yaxis=dict(ticksuffix="%")
+        yaxis = dict(ticksuffix="%"),
+        font=dict(color="#a5b1bf"),
+        plot_bgcolor='#282b38',
+        paper_bgcolor='#282b38'
     )
 
     data1 = [
@@ -198,7 +208,7 @@ def update_figures(deprv_label, domain_rank, share_label):
         mapbox_zoom=6,
         mapbox_center = {"lat": 57.834, "lon": -3.9},
         margin={"r":0,"t":0,"l":0,"b":0}, # sets the margins in px. default:80
-        paper_bgcolor=colors['background']
+        paper_bgcolor='#939090'#'#282b38'
         )
     return [{'data': data, 'layout': layout},
             {'data': data1, 'layout': layout1}]
