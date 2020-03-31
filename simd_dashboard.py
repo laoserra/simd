@@ -1,21 +1,27 @@
 import pandas as pd
 import plotly.graph_objects as go
 import dash
+#import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import json
 import base64
-
+'''
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'UBDC': 'Lilybank'
+}
+'''
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-with open('./GIS_data/Scotland_Councils10_wgs84.geojson') as myfile:
+with open('./GIS_data/Scotland_Councils_wgs84_1.json') as myfile:
     councils =  json.load(myfile)
 
 df = pd.read_csv('./Derived_Data/SIMD_2020_Ranks_and_Domain_Ranks.csv')
 
 # Launch the application
 app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
+#auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 
 colors = {
     'background': '#111111',
@@ -49,7 +55,7 @@ encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
 # Dash layout with several components: Div,Graph and Dropdown
 app.layout =html.Div([
-    html.Div([
+    html.Div([ #header div
         html.Div([
             html.H4(html.B('SIMD 2020 - LOCAL AND NATIONAL SHARE BY COUNCIL'),
                     style=dict(lineHeight='7vh', textAlign='center',
@@ -62,9 +68,11 @@ app.layout =html.Div([
         ], style=dict(backgroundColor=colors['background'], width='50%',
                       height='80%', margin='10px 10px')),
     ], style=dict(color='white', display='flex',
-                  backgroundColor=colors['background'], height='10vh')),
-    html.Div([
-        html.Div(
+                  backgroundColor=colors['background'],
+                  borderBottom='thin lightgrey solid',
+                  height='10vh')),
+    html.Div([ # graphics div
+        html.Div( # left graphics div
             style=dict(
                 width='50%',
                 backgroundColor=colors['background'],
@@ -74,7 +82,10 @@ app.layout =html.Div([
                     style={
                         'width': '330px',
                         'position': 'absolute',
-                        'top': '5vh', 'left': '5vh'},
+                        'top': '10vh', 'left': '20%',
+                        'color': 'red',
+                        'background-color': 'blue'
+                        },
                     children=[
                         dcc.Dropdown(
                             id='deprv_label',
@@ -106,7 +117,7 @@ app.layout =html.Div([
                 dcc.Graph(id='map', figure=dict(data=[], layout={}), style=dict(height='inherit'))
             ], style=dict(height='89vh'))
         ], style=dict(width='50%', float='right')) # outra forma de colocar a sintaxe
-    ], style={'backgroundColor': 'yellow', 'display': 'flex'})
+    ], style={'backgroundColor': 'black', 'display': 'flex'})
 ])
 # Create a Dash callback with three inputs and two outputs
 
