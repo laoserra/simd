@@ -204,11 +204,11 @@ def update_figures(deprv_label, domain_rank, share_label):
     layout1 = go.Layout(
         #title='blabla',
         #xaxis='blabla',
-        mapbox_style='carto-darkmatter',#'stamen-toner',#'carto-positron',
+        mapbox_style='open-street-map',#'carto-darkmatter',#'stamen-toner',#'carto-positron',
         mapbox_zoom=6,
         mapbox_center = {"lat": 57.834, "lon": -3.9},
         margin={"r":0,"t":0,"l":0,"b":0}, # sets the margins in px. default:80
-        paper_bgcolor='#939090'#'#282b38'
+        paper_bgcolor='#aad3df'#'#939090'#'#282b38'
         )
     return [{'data': data, 'layout': layout},
             {'data': data1, 'layout': layout1}]
