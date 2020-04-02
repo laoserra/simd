@@ -22,7 +22,7 @@ df = pd.read_csv('./Derived_Data/SIMD_2020_Ranks_and_Domain_Ranks.csv')
 # Launch the application
 app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
 #auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
-
+server = app.server # the Flask app
 '''
 colors = {
     'background': '#111111',
@@ -84,7 +84,7 @@ app.layout =html.Div([
                     style={
                         'width': '345px',
                         'position': 'absolute',
-                        'top': '10vh', 'left': '20%',
+                        'top': '4vh', 'left': '20%',
                         'color': '#a5b1bf',
                         'background-color': '#282b38'
                         },
@@ -205,8 +205,8 @@ def update_figures(deprv_label, domain_rank, share_label):
         #title='blabla',
         #xaxis='blabla',
         mapbox_style='open-street-map',#'carto-darkmatter',#'stamen-toner',#'carto-positron',
-        mapbox_zoom=6,
-        mapbox_center = {"lat": 57.834, "lon": -3.9},
+        mapbox_zoom=5.6,
+        mapbox_center = {"lat": 57.834, "lon": -5.0},
         margin={"r":0,"t":0,"l":0,"b":0}, # sets the margins in px. default:80
         paper_bgcolor='#aad3df'#'#939090'#'#282b38'
         )
